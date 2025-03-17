@@ -24,7 +24,7 @@ jobs:
           git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
       - name: Install pkgsite
         run: go install golang.org/x/pkgsite/cmd/pkgsite@latest
-      - name: Generate godoc
+      - name: Generate pkgsite docs
         run: |
           git fetch origin
           git switch gh-pages || git switch -c gh-pages
@@ -33,7 +33,7 @@ jobs:
           $(go env GOPATH)/bin/pkgsite -http=localhost:6061 & \
           sleep 10
           wget -r -np -nv -N -E -p -k -e robots=off --reject-regex="png" "http://localhost:6061/github.com/shirakiya/pkgsite-docs-test" || true
-          pkill godoc
+          pkill pkgsite
           mv localhost:6061/ docs/
       - name: Push docs to gh-pages
         run: |
