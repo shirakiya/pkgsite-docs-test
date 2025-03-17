@@ -32,7 +32,7 @@ jobs:
           rm -rf localhost:6061 docs
           $(go env GOPATH)/bin/pkgsite -http=localhost:6061 & \
           sleep 10
-          wget -r -np -nv -N -E -p -k -e robots=off --reject-regex="png" "http://localhost:6061/github.com/shirakiya/pkgsite-docs-test"
+          wget -r -np -nv -N -E -p -k -e robots=off --reject-regex="png" "http://localhost:6061/github.com/shirakiya/pkgsite-docs-test" || true
           pkill godoc
           mv localhost:6061/ docs/
       - name: Push docs to gh-pages
