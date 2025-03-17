@@ -1,0 +1,38 @@
+name: deploy pkgsite
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-pkgsite:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+      - name: Set git config
+        run: |
+          git config --global user.name github-actions[bot]
+          git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
+      - name: Install pkgsite
+        run: go install golang.org/x/pkgsite/cmd/pkgsite@latest
+      - name: Generate godoc
+        run: |
+          git fetch origin
+          git switch gh-pages || git switch -c gh-pages
+          git merge main
+          rm -rf localhost:6061 docs
+          $(go env GOPATH)/bin/pkgsite -http=localhost:6061 & \
+          sleep 10
+          wget -r -np -nv -N -E -p -k -e robots=off --reject-regex="png" "http://localhost:6061/github.com/shirakiya/pkgsite-docs-test"
+          pkill godoc
+          mv localhost:6061/ docs/
+      - name: Push docs to gh-pages
+        run: |
+          git add docs
+          git diff --cached --quiet || (git commit -m "update docs" && git push origin gh-pages)

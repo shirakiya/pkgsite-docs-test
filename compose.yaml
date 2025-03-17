@@ -1,0 +1,13 @@
+services:
+  pkgsite:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pkgsite-docs-test
+    container_name: pkgsite-docs-test
+    working_dir: /go/src/
+    ports:
+      - 6061:6061
+    volumes:
+      - .:/go/src/
+    command: pkgsite -http=:6061
